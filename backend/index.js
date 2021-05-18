@@ -19,7 +19,11 @@ app.get('/app', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('[SERVER] New connection!');
+  console.log('[SOCKET] New client connected!');
+
+  socket.on('disconnect', () => {
+    console.log('[SOCKET] Client disconnected!')
+  });
 });
 
 server.listen(PORT, () => console.log(`[SERVER] Started!`));
