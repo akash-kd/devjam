@@ -8,12 +8,18 @@ const io = socket(server);
 
 const PORT = process.env.PORT || 3000;
 
+app.set('view engine', 'ejs');
+
 app.get('/', (req, res) => {
-  res.send('<h1>Hello World!</h1>');
+  res.render('index');
+});
+
+app.get('/app', (req, res) => {
+  res.render('app');
 });
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('[SERVER] New connection!');
 });
 
-server.listen(PORT, () => console.log(`[SERVER] Started`));
+server.listen(PORT, () => console.log(`[SERVER] Started!`));
