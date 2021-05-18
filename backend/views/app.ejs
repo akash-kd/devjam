@@ -5,14 +5,39 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Devjam | App</title>
+  <style>
+    h1, h2 {
+      text-align: center;
+    }
+
+    #chatbox {
+      border: 1px solid black;
+      width: 80%;
+      margin: 2em auto;
+      height: 50vh;
+      overflow: auto;
+      padding-left: 0 1em;
+    }
+
+    .meta {
+      color: grey;
+      text-align: center;
+    }
+
+    .chat-r {
+      text-align: right;
+    }
+  </style>
 </head>
 <body>
-  <h1 style="text-align: center;">Welcome </h1>
-  <h2 style="text-align: center;">Room code: </h2>
+  <h1>Welcome </h1>
+  <h2>Room code: </h2>
   <p>
     <a href="/"">Click Here</a>
     to go back to the Homepage 
   </p>
+  <div id="chatbox">
+  </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
   <script src="/socket.io/socket.io.js"></script>
@@ -37,7 +62,17 @@
       room = r;
       console.log(r);
       $('h2').append(room);
-    })
+    });
+
+    // Will happen if a new user joins our room
+    socket.on('userJoin', name => {
+      $('#chatbox').append(`<div class="meta">${name} has joined the room!</div>`);
+    });
+
+    // Will happen if a user leaves our room
+    socket.on('userLeave', name => {
+      $('#chatbox').append(`<div class="meta">${name} has left the room!</div>`);
+    });
 
     console.log(name, room, type);
   </script>

@@ -44,16 +44,27 @@ io.on('connection', (socket) => {
     // Joining the socket to the room
     socket.join(room);
 
+    // If the user is joining an already existing room
+    // We need to alert the other users already in the room
+    // that the user has joined. This event helps with that
+    if (type === 'join')
+      socket.broadcast.to(room).emit('userJoin', name);
+
     // Will help us keep track of users
-    users.push({ name, room });
+    users.push({ id: socket.id, name, room });
   });
 
   // Helps us keep track of when the user disconnects
+  // so that we can perform cleanup tasks
   socket.on('disconnect', () => {
     console.log('[SOCKET] Client disconnected!');
-  });
 
-  console.log(users);
+    // Remove the user from the global users list
+    let user = users.splice(users.findIndex(user => user.id === socket.id), 1)[0];
+    
+    // Tells all the other users in that room, that the user has left
+    socket.broadcast.to(user.room).emit('userLeave', user.name);
+  });
 });
 
 server.listen(PORT, () => console.log(`[SERVER] Started!`));
