@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
     if (type === 'create')
     {
       // Creating room
-      room = socket.id;
+      room = `RO${socket.id}OM`;
 
       // Sending room to client
       socket.emit('getRoom', room);
@@ -53,6 +53,17 @@ io.on('connection', (socket) => {
     // Will help us keep track of users
     users.push({ id: socket.id, name, room });
   });
+
+  // This event will be used to get messages from the various users
+  // in a room. When we get a message, we send back the message along
+  // with the info about the user who sent it, to everyone in the user's
+  // room except the user.
+  socket.on('chatSend', message => {
+    let user = users.find(user => user.id === socket.id);
+    console.log(user);
+    
+    socket.broadcast.to(user.room).emit('chatReceive', { name: user.name, message });
+  })
 
   // Helps us keep track of when the user disconnects
   // so that we can perform cleanup tasks

@@ -10,22 +10,46 @@
       text-align: center;
     }
 
-    #chatbox {
+    #centerbox {
       border: 1px solid black;
       width: 80%;
       margin: 2em auto;
       height: 50vh;
-      overflow: auto;
       padding-left: 0 1em;
+    }
+
+    #chatbox {
+      border-bottom: 1px solid black;
+      overflow: auto;
+      height: 90%;
+    }
+
+    #textbox {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #textbox input {
+      outline: none;
+      border: none;
+      font-size: 1.5rem;
+      flex: 1;
     }
 
     .meta {
       color: grey;
       text-align: center;
+      font-size: 1.5rem;
     }
 
     .chat-r {
       text-align: right;
+      font-size: 1.5rem;
+    }
+
+    .chat-l {
+      text-align: left;
+      font-size: 1.5rem;
     }
   </style>
 </head>
@@ -36,7 +60,13 @@
     <a href="/"">Click Here</a>
     to go back to the Homepage 
   </p>
-  <div id="chatbox">
+
+  <div id="centerbox">
+    <div id="chatbox"></div>
+    <div id="textbox">
+      <input id="message" placeholder="Enter Message" type="text">
+      <button>Send</button>
+    </div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -72,6 +102,19 @@
     // Will happen if a user leaves our room
     socket.on('userLeave', name => {
       $('#chatbox').append(`<div class="meta">${name} has left the room!</div>`);
+    });
+
+    // To send messages from client to server i.e when we send a message
+    $('#textbox button').click(e => {
+      let message = $('#textbox input').val();
+      if (message !== '')
+        socket.emit('chatSend', message);
+      $('#chatbox').append(`<div class="chat-r">${name}<br>${message}</div>`);
+    });
+
+    // Will happen when some other user from our room sends a message
+    socket.on('chatReceive', ({name, message}) => {
+      $('#chatbox').append(`<div class="chat-l">${name}<br>${message}</div>`);
     });
 
     console.log(name, room, type);
