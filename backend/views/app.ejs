@@ -7,15 +7,39 @@
   <title>Devjam | App</title>
 </head>
 <body>
-  <h1 style="text-align: center;">App</h1>
+  <h1 style="text-align: center;">Welcome </h1>
+  <h2 style="text-align: center;">Room code: </h2>
   <p>
     <a href="/"">Click Here</a>
     to go back to the Homepage 
   </p>
 
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
+
+    let name = `<%- name  %>`;
+    let room = `<%- room  %>`;
+    let type = `<%- type  %>`;
+
+    $(document).ready(() => {
+      $('h1').append(name);
+      $('h2').append(room);
+    });
+    
+    // Letting server know that we joined and sending
+    // required info
+    socket.emit('enter', { name, room, type });
+
+    // Will happen if type mentioned by the user is create
+    socket.on('getRoom', r => {
+      room = r;
+      console.log(r);
+      $('h2').append(room);
+    })
+
+    console.log(name, room, type);
   </script>
 </body>
 </html>
