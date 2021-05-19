@@ -1,13 +1,13 @@
-
-
-import {Route,BrowserRouter as Router } from 'react-router-dom'
+import { createContext } from 'react'
+import Player from '../components/Player'
 
 function Main() {
+  const socket = 'ws://localhost:8080'
   return (
-      <div className="App">
-        MAIN APP
-      </div>
-  );
+    <>
+      <Player socket={socket} />
+    </>
+  )
 }
 
-export default Main;
+export default Main
