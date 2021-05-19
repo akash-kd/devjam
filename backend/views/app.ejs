@@ -94,6 +94,12 @@
       $('h2').append(room);
     });
 
+    // Will happen if type mentioned by the user is join
+    socket.on('validateRoom', check => {
+      if (!check)
+        window.location = '/';
+    })
+
     // Will happen if a new user joins our room
     socket.on('userJoin', name => {
       $('#chatbox').append(`<div class="meta">${name} has joined the room!</div>`);
