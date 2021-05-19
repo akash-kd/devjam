@@ -1,5 +1,3 @@
-
-
 //tailwind & css
 import '../styles/tailwind.css';
 import '../styles/main.css';
@@ -8,8 +6,14 @@ import '../styles/main.css';
 import TextInput from '../components/textInput.js';
 import Button from '../components/button.js'
 
+import { useContext } from 'react'
+import { Route, BrowserRouter as Router } from 'react-router-dom'
+import StateContext from '../StateContext'
+import UpdateContext from '../UpdateContext'
 
 function Home() {
+  const state = useContext(StateContext)
+  const setState = useContext(UpdateContext)
   return (
     <div className="flex flex-row w-full py-3 px-12 items-center justify-end">
       <div className="flex flex-col bg-gray-900 h-5/6 w-1/3 p-4 border-2 border-indigo-600 rounded-md items-center justify-center">
@@ -23,4 +27,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Home
