@@ -107,7 +107,10 @@
       // Means he tried to join a non-existent room
       // so we kick him
       if (!check)
+      {
+        alert('Please enter a valid room code!');
         window.location = '/';
+      }
     })
 
     // Will happen if a new user joins our room
