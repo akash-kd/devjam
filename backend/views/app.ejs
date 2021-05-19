@@ -54,7 +54,7 @@
   </style>
 </head>
 <body>
-  <h1>Welcome </h1>
+  <h1></h1>
   <h2>Room code: </h2>
   <p>
     <a href="/"">Click Here</a>
@@ -77,9 +77,11 @@
     let name = `<%- name  %>`;
     let room = `<%- room  %>`;
     let type = `<%- type  %>`;
+    let admin = type === 'create';
+    let id;
 
     $(document).ready(() => {
-      $('h1').append(name);
+      $('h1').html(`Welcome ${name}${admin ? ` (Admin)`: ``}`);
       $('h2').append(room);
     });
     
@@ -94,8 +96,16 @@
       $('h2').append(room);
     });
 
+    // Will happen once for every user
+    socket.on('getID', socket_id => {
+      id = socket_id;
+      console.log(id);
+    });
+
     // Will happen if type mentioned by the user is join
     socket.on('validateRoom', check => {
+      // Means he tried to join a non-existent room
+      // so we kick him
       if (!check)
         window.location = '/';
     })
@@ -103,6 +113,22 @@
     // Will happen if a new user joins our room
     socket.on('userJoin', name => {
       $('#chatbox').append(`<div class="meta">${name} has joined the room!</div>`);
+    });
+
+    // Will happen if the admin leaves our room
+    socket.on('adminLeave', ({ name, new_admin }) => {
+      $('#chatbox').append(`<div class="meta">Admin (${name}) has left the room!</div>`);
+
+      // We are the new admin
+      if (new_admin.id === id)
+      {
+        admin = true;
+        $('h1').html(`Welcome ${new_admin.name}${admin ? ` (Admin)`: ``}`);
+        $('#chatbox').append(`<div class="meta">You are the new admin!</div>`);
+      }
+      // Someone else is the new admin
+      else
+        $('#chatbox').append(`<div class="meta">${new_admin.name} is the new admin!</div>`);
     });
 
     // Will happen if a user leaves our room

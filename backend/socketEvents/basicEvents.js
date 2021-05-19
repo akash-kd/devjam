@@ -13,7 +13,10 @@ function basicEvents(socket, users, rooms)
     {
       // Creating room
       room = `RO${socket.id}OM`;
-      rooms[room] = 1;
+      rooms[room] = {
+        count: 1,
+        admin: socket.id
+      };
 
       // Sending room to client
       socket.emit('getRoom', room);
@@ -33,8 +36,9 @@ function basicEvents(socket, users, rooms)
       // This means that the room does exist
       else
       {
-        ++rooms[room];
         socket.emit('validateRoom', true);
+
+        ++rooms[room].count;
 
         // We need to alert the other users already in the room
         // that the user has joined. This event helps with that
@@ -42,8 +46,13 @@ function basicEvents(socket, users, rooms)
       }
     }
 
+    // We are sending the socket id back to the user as well
+    socket.emit('getID', socket.id);
+
     // Will help us keep track of users
-    users.push({ id: socket.id, name, room });
+    // admin refers to the user who created the room who will access
+    // to controlling the video playback
+    users.push({ id: socket.id, name, room, admin: type === 'create'});
   });
 
   // Helps us keep track of when the user disconnects
@@ -54,14 +63,37 @@ function basicEvents(socket, users, rooms)
     // Remove the user from the global users list
     let user = users.splice(users.findIndex(user => user.id === socket.id), 1)[0];
 
+    // The reason we are checking this is because users can join
+    // into non existing rooms, connect to the socket and then
+    // "validateRoom" will return false, and then they leave
+    // and "disconnect" occurs. Hence we only want the next actions
+    // to occur if the room actually exists
     if (typeof(rooms[user.room]) !== "undefined")
     {
-      // Tells all the other users in that room, that the user has left
-      socket.broadcast.to(user.room).emit('userLeave', user.name);
+      --rooms[user.room].count;
 
-      rooms[user.room]--;
-      if (!rooms[user.room])
+      // Deleting room if no one is in it
+      if (!rooms[user.room].count)
         delete rooms[user.room];
+      // If user is admin and there are still people in the room
+      // we need to assign a new admin
+      else if (user.admin)
+      {
+        // Gets all the users of the room
+        let room_users = users.filter(u => u.room === user.room);
+
+        // Chooses a random user to be the new admin
+        let new_admin = room_users[Math.floor(Math.random()*room_users.length)];
+
+        // Tells all the other users in that room, that the admin has left
+        socket.broadcast.to(user.room).emit('adminLeave', { name: user.name, new_admin });
+
+        let new_admin_index = users.findIndex(u => u.id === new_admin.id);
+        users[new_admin_index].admin = true;
+      }
+      else
+        // Tells all the other users in that room, that the user has left
+        socket.broadcast.to(user.room).emit('userLeave', user.name);
     }
   });
 }
