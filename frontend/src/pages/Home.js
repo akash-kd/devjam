@@ -48,11 +48,11 @@ function Home(props) {
           />
         </Link>
         <a className='text-center w-100 text-xl my-3'> or</a>
-        <Link to='/app'>
+        <Link to={`/app?name=${state.user.isAdmin}&roomId=${state.roomId}`}>
           <Button
             onClick={() =>
               setState(state => {
-                state.user.isAdmin = false
+                state.user.isAdmin = true
               })
             }
             text='Create A Room'
