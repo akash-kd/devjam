@@ -1,5 +1,5 @@
 import { Route, BrowserRouter as Router } from 'react-router-dom'
-import React, { createRef, useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import TextInput from './textInput'
 import ReactPlayer from 'react-player'
 import Button from './button'
@@ -9,7 +9,7 @@ function Player({ socket }) {
   const state = useContext(StateContext)
   const [inputUrl, setInputUrl] = useState('')
   const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=MnUd31TvBoU')
-  const player = createRef(null)
+  const player = useRef()
 
   //listen for Video Info for the first time component renders
   useEffect(() => {
@@ -20,6 +20,17 @@ function Player({ socket }) {
       if (data.currStatus == 1) player.current.playVideo()
       else player.current.pauseVideo()
     })
+
+    // emitting Video Info from admin if new user joins
+    if (state.user.isAdmin) {
+      socket.on('userJoin', name => {
+        socket.emit('sendInfo', {
+          url: videoUrl,
+          currTime: player.current.getCurrentTime(),
+          currStatus: player.current.getInternalPlayer().getPlayerState(),
+        })
+      })
+    }
   }, [])
 
   //listening for pause from server
@@ -31,17 +42,6 @@ function Player({ socket }) {
   socket.on('urlChange', url => {
     setVideoUrl(url)
   })
-
-  // emitting Video Info from admin if new user joins
-  if (state.user.isAdmin) {
-    socket.on('userJoin', name => {
-      socket.emit('sendInfo', {
-        url: videoUrl,
-        currTime: player.current.getCurrentTime(),
-        currStatus: player.current.getInternalPlayer().getPlayerState(),
-      })
-    })
-  }
 
   //sending pause Event from Admin so server sends a Pause to everyone in the room
   const onPause = e => {
