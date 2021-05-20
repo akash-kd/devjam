@@ -6,6 +6,8 @@ import StateContext from '../StateContext'
 import UpdateContext from '../UpdateContext'
 import { withRouter } from 'react-router'
 
+import Chatbox from '../components/chatbox'
+
 function Main(props) {
   const state = useContext(StateContext)
   const setState = useContext(UpdateContext)
@@ -47,6 +49,7 @@ function Main(props) {
   return (
     <>
       <Player />
+      <Chatbox/>
     </>
   )
 }

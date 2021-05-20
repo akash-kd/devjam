@@ -16,56 +16,64 @@ function Home(props) {
   const setState = useContext(UpdateContext)
 
   return (
-    <div className='flex flex-row w-full py-3 px-12 items-center justify-end'>
+    <div className='flex flex-row w-full py-3 px-12 items-center justify-center'>
       <div className='flex flex-col bg-gray-900 h-5/6 w-1/3 p-4 border-2 border-indigo-600 rounded-md items-center justify-center'>
         
-        <TextInput
-          value={state.user.username}
-          onChange={e =>
-            setState(state => {
-              state.user.username = e.target.value
-            })
-          }
-          placeholder='Enter your name'
-        />
-        <a className='text-center w-100 text-md my-2 opacity-70'>Enjoy the vedio with friend losing no Sync !</a>
+      <a className='text-center w-100 text-md my-2 opacity-70'>Enjoy the vedio with friend losing no Sync !</a>
 
-        <TextInput
-          value={state.roomId}
-          onChange={e =>
-            setState(state => {
-              state.roomId = e.target.value
-            })
-          }
-          placeholder='Enter the Room Code'
-        />
+      <TextInput
+        value={state.user.username}
+        onChange={e =>
+          setState(state => {
+            state.user.username = e.target.value
+          })
+        }
+        placeholder='Enter your name'
+      />
 
-        <Link to={`/app?name=${state.user.isAdmin}&roomId=${state.roomId}`}>
-          <Button
-            text='Join Room with code'
-            onClick={() =>
-              setState(state => {
-                state.user.isAdmin = false
-              })
-            }
-          />
-        </Link>
+        
+      <TextInput
+        value={state.roomId}
+        onChange={e =>
+          setState(state => {
+            state.roomId = e.target.value
+          })
+        }
+        placeholder='Enter the Room Code'
+      />
 
 
-        <a className='text-center w-100 text-xl my-3'> or</a>
+        <div className="flex flex-col w-full py-2">
+
+          <Link to={`/app?name=${state.user.isAdmin}&roomId=${state.roomId}`}>
+            <Button
+              text='Join Room with code'
+              onClick={() =>
+                setState(state => {
+                  state.user.isAdmin = false
+                })
+              }
+              fullWidth={true}
+            />
+          </Link>
 
 
-        <Link to={`/app?name=${state.user.isAdmin}&roomId=${state.roomId}`}>
-          <Button
-            onClick={() =>
-              setState(state => {
-                state.user.isAdmin = true
-              })
-            }
-            text='Create A Room'
-            fullWidth={true}
-          />
-        </Link>
+          <a className='text-center w-100 text-xl my-3'> or</a>
+
+
+          <Link to={`/app?name=${state.user.isAdmin}&roomId=${state.roomId}`}>
+            <Button
+              onClick={() =>
+                setState(state => {
+                  state.user.isAdmin = true
+                })
+              }
+              text='Create A Room'
+              fullWidth={true}
+            />
+          </Link>
+
+        </div>
 
       </div>
     </div>
