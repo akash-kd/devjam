@@ -1,24 +1,21 @@
 
 //tailwind & css
-
-import '../styles/tailwind.css';
-import '../styles/main.css';
+import '../styles/tailwind.css'
+import '../styles/main.css'
+import { Link } from 'react-router-dom'
 
 function Button(props) {
-    return (
-
-        <a href={props.href} className={'shadow-md items-center justify-center text-white p-1 px-4 mx-2 text-center border-2 rounded-md border-indigo-600' + (props.onlyOutline ? ' ' : ' bg-indigo-500') + (props.fullWidth ? ' w-full' : ' ')}>
-           {props.text} 
-           {props.OnlyOutline}
-        </a>
-    );
+  return (
+    <button onClick={props.onClick} className={'flex shadow-md items-center justify-center text-white p-1 px-4 mx-4 text-center border-2 rounded-md border-indigo-600' + (props.onlyOutline ? ' ' : ' bg-indigo-500') + (props.fullWidth ? ' w-full' : ' ')}>
+      {props.text}
+      {props.OnlyOutline}
+    </button>
+  )
 }
-
 
 Button.defaultProps = {
-    OnlyOutline:false,
-    fullWidth:false,
-    href:'/'
+  OnlyOutline: false,
+  fullWidth: false,
 }
 
-export default Button;
+export default Button
