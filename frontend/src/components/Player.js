@@ -5,7 +5,7 @@ import ReactPlayer from 'react-player'
 import Button from './button'
 import StateContext from '../StateContext'
 
-function Player({ socket }) {
+function Player({ socket, users }) {
   const state = useContext(StateContext)
   const [inputUrl, setInputUrl] = useState('')
   const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=MnUd31TvBoU')
@@ -13,6 +13,7 @@ function Player({ socket }) {
 
   //listen for Video Info for the first time component renders
   useEffect(() => {
+    console.log(player.current)
     socket.on('getInfo', data => {
       setVideoUrl(data.url)
       player.current.seekTo(data.currTime)
@@ -33,15 +34,19 @@ function Player({ socket }) {
   })
 
   // emitting Video Info from admin if new user joins
-  if (state.user.isAdmin) {
-    socket.on('userJoin', name => {
-      socket.emit('sendInfo', {
-        url: videoUrl,
-        currTime: player.current.getCurrentTime(),
-        currStatus: player.current.getInternalPlayer().getPlayerState(),
+  useEffect(() => {
+    const temp = player.current
+    if (state.user.isAdmin && temp) {
+      socket.on('userJoin', name => {
+        console.log(temp)
+        socket.emit('sendInfo', {
+          url: videoUrl,
+          currTime: temp.getCurrentTime(),
+          currStatus: typeof temp.getInternalPlayer().getPlayerState === 'function' && temp.getInternalPlayer().getPlayerState(),
+        })
       })
-    })
-  }
+    }
+  }, [player.current, users])
 
   //sending pause Event from Admin so server sends a Pause to everyone in the room
   const onPause = e => {
@@ -52,8 +57,11 @@ function Player({ socket }) {
   //sending UrlChanged event so server broadcasts a urlChange event
   const handleSubmit = e => {
     e.preventDefault()
-    console.log(player.current.getInternalPlayer().getPlayerState())
-    console.log(player.current.getCurrentTime())
+    console.log(player.current.getInternalPlayer())
+    if (typeof player.current.getInternalPlayer().getPlayerState === 'function') {
+      console.log(player.current.getInternalPlayer().getPlayerState())
+      console.log(player.current.getCurrentTime())
+    }
     console.log(videoUrl)
 
     setVideoUrl(inputUrl)
@@ -74,6 +82,7 @@ function Player({ socket }) {
       <div>
         <ReactPlayer
           ref={player}
+          id='player'
           config={{
             youtube: {
               playerVars: { controls: state.user.isAdmin ? 1 : 0 },
@@ -86,6 +95,8 @@ function Player({ socket }) {
           onPause={onPause}
         />
       </div>
+      <div>ROOMID = {' ' + state.roomId}</div>
+      <div>USERS = {' ' + users}</div>
     </div>
   )
 }
