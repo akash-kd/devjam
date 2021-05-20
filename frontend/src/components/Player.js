@@ -18,7 +18,7 @@ function Player({ socket }) {
       setVideoUrl(data.url)
       player.current.seekTo(data.currTime)
       //playing if the received status is play, else pause, will adjust for buffering later
-      setIsPlaying(data.currStatus === 1)
+      setIsPlaying(data.currStatus == 1)
       // if (data.currStatus == 1) player.current.getInternalPlayer().playVideo()
       // else player.current.getInternalPlayer().pauseVideo()
     })
@@ -36,19 +36,29 @@ function Player({ socket }) {
 
     //listening for pause from server
     socket.on('pause', () => {
-      player.current.getInternalPlayer().pauseVideo()
+      if (!state.user.isAdmin) player.current.getInternalPlayer().pauseVideo()
+    })
+
+    //listening for play from server
+    socket.on('play', () => {
+      if (!state.user.isAdmin) player.current.getInternalPlayer().playVideo()
     })
 
     //listening for urlChange from server
     socket.on('urlChange', url => {
-      setVideoUrl(url)
+      if (!state.user.isAdmin) setVideoUrl(url)
     })
   }, [])
 
   //sending pause Event from Admin so server sends a Pause to everyone in the room
   const onPause = e => {
     console.log(player.current.getCurrentTime())
-    if (state.user.isAdmin) socket.emit('paused', 'VIDEO PAUSED')
+    if (state.user.isAdmin) socket.emit('paused')
+  }
+
+  const onPlay = e => {
+    console.log(player.current.getCurrentTime())
+    if (state.user.isAdmin) socket.emit('played')
   }
 
   //sending UrlChanged event so server broadcasts a urlChange event
@@ -59,7 +69,7 @@ function Player({ socket }) {
     console.log(videoUrl)
 
     setVideoUrl(inputUrl)
-    socket.emit('urlChanged', videoUrl)
+    socket.emit('urlChanged', inputUrl)
     // setVideoId(inputUrl.split('v=')[1].split('&')[0])
   }
 
@@ -86,6 +96,7 @@ function Player({ socket }) {
           height='450px'
           style={{ pointerEvents: !state.user.isAdmin && 'none' }}
           onPause={onPause}
+          onPlay={onPlay}
           playing={isPlaying}
         />
       </div>
