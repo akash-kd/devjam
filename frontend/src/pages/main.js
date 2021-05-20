@@ -11,8 +11,11 @@ function Main(props) {
   const setState = useContext(UpdateContext)
 
   const socket = io('http://localhost:8080')
+  
   useEffect(() => {
+
     console.log(state)
+
     socket.emit('enter', { name: state.user.username, room: state.roomId, type: state.user.isAdmin ? 'create' : 'join' })
     // Will happen if type mentioned by the user is create
     socket.on('getRoom', r => {
