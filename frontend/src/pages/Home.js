@@ -31,47 +31,47 @@ function Home(props) {
         placeholder='Enter your name'
       />
 
-        
-      <TextInput
-        value={state.roomId}
-        onChange={e =>
-          setState(state => {
-            state.roomId = e.target.value
-          })
-        }
-        placeholder='Enter the Room Code'
-      />
-
-
         <div className="flex flex-col w-full py-2">
 
-          <Link to={`/app?name=${state.user.isAdmin}&roomId=${state.roomId}`}>
-            <Button
-              text='Join Room with code'
-              onClick={() =>
+            <Link to={`/app?name=${state.user.isAdmin}&roomId=${state.roomId}`}>
+              <Button
+                onClick={() =>
+                  setState(state => {
+                    state.user.isAdmin = true
+                  })
+                }
+                text='Create A Room'
+                fullWidth={true}
+              />
+            </Link>
+
+            <a className='text-center w-100 text-xl my-3'> or</a>
+
+            <div className="flex flex-row items-center justify-between">
+
+            <Link to={`/app?name=${state.user.isAdmin}&roomId=${state.roomId}`}>
+              <Button
+                text='Join Room'
+                onClick={() =>
+                  setState(state => {
+                    state.user.isAdmin = false
+                  })
+                }
+                fullWidth={true}
+              />
+            </Link>
+            
+            <TextInput
+              value={state.roomId}
+              onChange={e =>
                 setState(state => {
-                  state.user.isAdmin = false
+                  state.roomId = e.target.value
                 })
               }
-              fullWidth={true}
+              placeholder='Enter the Room Code'
+              side
             />
-          </Link>
-
-
-          <a className='text-center w-100 text-xl my-3'> or</a>
-
-
-          <Link to={`/app?name=${state.user.isAdmin}&roomId=${state.roomId}`}>
-            <Button
-              onClick={() =>
-                setState(state => {
-                  state.user.isAdmin = true
-                })
-              }
-              text='Create A Room'
-              fullWidth={true}
-            />
-          </Link>
+          </div>
 
         </div>
 

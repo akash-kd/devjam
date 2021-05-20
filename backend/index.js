@@ -3,6 +3,7 @@ const http = require('http')
 const socket = require('socket.io')
 const chatEvents = require('./socketEvents/chatEvents')
 const basicEvents = require('./socketEvents/basicEvents')
+const playerEvents = require('./socketEvents/playerEvents')
 
 const app = express()
 const server = http.createServer(app)
@@ -41,6 +42,10 @@ io.on('connection', socket => {
   // Takes care of all chat events the socket has to
   // setup for like when the user sends/receives messages etc.
   chatEvents(socket, users)
+
+  // Takes care of all player events the socket has to
+  // setup for like when the admin pauses/seeks the video etc.
+  playerEvents(socket, users, rooms)
 
   console.log(rooms)
 })
