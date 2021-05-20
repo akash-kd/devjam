@@ -47,10 +47,10 @@ function Main(props) {
     console.log(`${name} has joined the room!</div>`)
   })
   return (
-    <>
+    <div className="flex flex-row w-full h-full sm:flex-row p-10 justify-center">
       <Player />
       <Chatbox/>
-    </>
+    </div>
   )
 }
 

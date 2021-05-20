@@ -31,6 +31,10 @@ function Home(props) {
         placeholder='Enter your name'
       />
 
+      <TextInput
+        value={state.roomId}
+        placeholder="Enter the Room's Name"
+      />
         
       <TextInput
         value={state.roomId}
