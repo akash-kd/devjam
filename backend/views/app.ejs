@@ -93,7 +93,7 @@
     socket.on('getRoom', r => {
       room = r;
       console.log(r);
-      $('h2').append(room);
+      $('h2').append(room.id);
     });
 
     // Will happen once for every user

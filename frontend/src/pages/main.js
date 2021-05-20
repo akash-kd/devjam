@@ -1,25 +1,32 @@
-import { createContext, useEffect } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import Player from '../components/Player'
 import { io } from 'socket.io-client'
 import { useContext } from 'react'
 import StateContext from '../StateContext'
 import UpdateContext from '../UpdateContext'
 import { withRouter } from 'react-router'
+import Chat from '../components/Chat'
 
 function Main(props) {
   const state = useContext(StateContext)
   const setState = useContext(UpdateContext)
 
-  const socket = io('http://localhost:8080')
+  const [users, setUsers] = useState(0)
+
+  let socket
+  const ENDPOINT = 'http://localhost:8080'
+  socket = io(ENDPOINT)
   useEffect(() => {
-    console.log(state)
+    // console.log(state)
     socket.emit('enter', { name: state.user.username, room: state.roomId, type: state.user.isAdmin ? 'create' : 'join' })
+
     // Will happen if type mentioned by the user is create
     socket.on('getRoom', r => {
       console.log(r)
       setState(state => {
-        state.roomId = r
+        state.roomId = r.id
       })
+      setUsers(r.count)
     })
 
     socket.on('getID', socket_id => {
@@ -32,18 +39,15 @@ function Main(props) {
       // so we kick him
       if (!check) {
         console.error('Please enter a valid room code!')
-        // props.history.push('/')
+        props.history.push('/')
       }
     })
-
-    // Will happen if a new user joins our room
   }, [])
-  socket.on('userJoin', name => {
-    console.log(`${name} has joined the room!</div>`)
-  })
+
   return (
     <>
-      <Player />
+      <Player socket={socket} />
+      <Chat socket={socket} />
     </>
   )
 }
