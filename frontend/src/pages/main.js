@@ -47,7 +47,6 @@ function Main(props) {
   return (
     <>
       <Player socket={socket} />
-      <Chat socket={socket} />
     </>
   )
 }

@@ -1,51 +1,90 @@
 import { Route, BrowserRouter as Router } from 'react-router-dom'
-import React, { useEffect, useRef, useState } from 'react'
-import YouTube from 'react-youtube'
+import React, { createRef, useContext, useEffect, useRef, useState } from 'react'
 import TextInput from './textInput'
+import ReactPlayer from 'react-player'
+import Button from './button'
+import StateContext from '../StateContext'
 
-function Player(props) {
-  //    useEffect(() => {
-  //         props.socket.
-  //    },[])
+function Player({ socket }) {
+  const state = useContext(StateContext)
+  const [inputUrl, setInputUrl] = useState('')
+  const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=MnUd31TvBoU')
+  const player = createRef(null)
 
-  const [videoUrl, setVideoUrl] = useState('')
-  const [videoId, setVideoId] = useState('')
-  // const player = useRef(null)
+  //listen for Video Info for the first time component renders
+  useEffect(() => {
+    socket.on('getInfo', data => {
+      setVideoUrl(data.url)
+      player.current.seekTo(data.currTime)
+      //playing if the received status is play, else pause, will adjust for buffering later
+      if (data.currStatus == 1) player.current.playVideo()
+      else player.current.pauseVideo()
+    })
+  }, [])
 
-  const handleSubmit = e => {
-    e.preventDefault()
-    console.log(videoUrl)
-    console.log(videoId)
-    if (videoUrl && videoUrl.split('v=')[1]) {
-      setVideoId(videoUrl.split('v=')[1].split('&')[0])
-    }
+  //listening for pause from server
+  socket.on('pause', () => {
+    player.current.pauseVideo()
+  })
+
+  //listening for urlChange from server
+  socket.on('urlChange', url => {
+    setVideoUrl(url)
+  })
+
+  // emitting Video Info from admin if new user joins
+  if (state.user.isAdmin) {
+    socket.on('userJoin', name => {
+      socket.emit('sendInfo', {
+        url: videoUrl,
+        currTime: player.current.getCurrentTime(),
+        currStatus: player.current.getInternalPlayer().getPlayerState(),
+      })
+    })
   }
 
-  const opts = {
-    playerVars: {
-      autoplay: 1,
-    },
-    height: '450',
-    width: '800',
+  //sending pause Event from Admin so server sends a Pause to everyone in the room
+  const onPause = e => {
+    console.log(player.current.getCurrentTime())
+    if (state.user.isAdmin) socket.emit('paused', 'VIDEO PAUSED')
+  }
+
+  //sending UrlChanged event so server broadcasts a urlChange event
+  const handleSubmit = e => {
+    e.preventDefault()
+    console.log(player.current.getInternalPlayer().getPlayerState())
+    console.log(player.current.getCurrentTime())
+    console.log(videoUrl)
+
+    setVideoUrl(inputUrl)
+    socket.emit('urlChanged', videoUrl)
+    // setVideoId(inputUrl.split('v=')[1].split('&')[0])
   }
 
   return (
-    <div className='App'>
-      MAIN APP
-      <div>
-        <form onSubmit={handleSubmit}>
-          <TextInput placeholder='Enter YT video link' value={videoUrl} onChange={e => setVideoUrl(e.target.value)} />
-          <button type='submit'>Go</button>
-        </form>
+    <div>
+      {state.user.isAdmin && (
         <div>
-          <YouTube
-            // ref={player}
-            videoId={videoId}
-            containerClassName='embed embed-youtube'
-            // onStateChange={e => checkElapsedTime(e)}
-            opts={opts}
-          />
+          <form onSubmit={handleSubmit}>
+            <TextInput placeholder='Enter YT video link' value={inputUrl} onChange={e => setInputUrl(e.target.value)} />
+            <Button text='change video' type='submit' />
+          </form>
         </div>
+      )}
+      <div>
+        <ReactPlayer
+          ref={player}
+          config={{
+            youtube: {
+              playerVars: { controls: state.user.isAdmin ? 1 : 0 },
+            },
+          }}
+          url={videoUrl}
+          width='800px'
+          height='450px'
+          style={{ pointerEvents: !state.user.isAdmin && 'none' }}
+          onPause={onPause}
+        />
       </div>
     </div>
   )
