@@ -7,17 +7,20 @@ import UpdateContext from '../UpdateContext'
 import { withRouter } from 'react-router'
 import Chat from '../components/Chat'
 
+import Chatbox from '../components/chatbox'
+
 function Main(props) {
   const state = useContext(StateContext)
   const setState = useContext(UpdateContext)
-
   const [users, setUsers] = useState(0)
 
   let socket
   const ENDPOINT = 'http://localhost:8080'
   socket = io(ENDPOINT)
+
   useEffect(() => {
-    // console.log(state)
+    console.log(state)
+
     socket.emit('enter', { name: state.user.username, room: state.roomId, type: state.user.isAdmin ? 'create' : 'join' })
 
     // Will happen if type mentioned by the user is create
@@ -44,9 +47,18 @@ function Main(props) {
     })
   }, [])
 
+  socket.on('userJoin', name => {
+    console.log(name, 'joined the room')
+  })
+
+  socket.on('userLeave', name => {
+    console.log(name, 'left the room')
+  })
+
   return (
     <>
       <Player socket={socket} />
+      <Chatbox />
     </>
   )
 }
