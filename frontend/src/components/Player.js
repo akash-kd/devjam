@@ -9,6 +9,7 @@ function Player({ socket }) {
   const state = useContext(StateContext)
   const [inputUrl, setInputUrl] = useState('')
   const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=MnUd31TvBoU')
+  const [isPlaying, setIsPlaying] = useState(true)
   const player = useRef()
 
   //listen for Video Info for the first time component renders
@@ -17,8 +18,9 @@ function Player({ socket }) {
       setVideoUrl(data.url)
       player.current.seekTo(data.currTime)
       //playing if the received status is play, else pause, will adjust for buffering later
-      if (data.currStatus == 1) player.current.playVideo()
-      else player.current.pauseVideo()
+      setIsPlaying(data.currStatus === 1)
+      // if (data.currStatus == 1) player.current.getInternalPlayer().playVideo()
+      // else player.current.getInternalPlayer().pauseVideo()
     })
 
     // emitting Video Info from admin if new user joins
@@ -31,17 +33,17 @@ function Player({ socket }) {
         })
       })
     }
+
+    //listening for pause from server
+    socket.on('pause', () => {
+      player.current.getInternalPlayer().pauseVideo()
+    })
+
+    //listening for urlChange from server
+    socket.on('urlChange', url => {
+      setVideoUrl(url)
+    })
   }, [])
-
-  //listening for pause from server
-  socket.on('pause', () => {
-    player.current.pauseVideo()
-  })
-
-  //listening for urlChange from server
-  socket.on('urlChange', url => {
-    setVideoUrl(url)
-  })
 
   //sending pause Event from Admin so server sends a Pause to everyone in the room
   const onPause = e => {
@@ -84,6 +86,7 @@ function Player({ socket }) {
           height='450px'
           style={{ pointerEvents: !state.user.isAdmin && 'none' }}
           onPause={onPause}
+          playing={isPlaying}
         />
       </div>
     </div>
