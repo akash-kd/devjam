@@ -15,10 +15,14 @@ import './styles/tailwind.css';
 import './styles/main.css'
 
 
-function App() {
-  return (
-    <div className="flex flex-col h-screen bg-gray-700">
 
+function App() {
+
+
+  return (
+    <div className="back flex flex-col h-screen bg-gray-800">
+    
+    {/*NAV BAR ****************/ }
     <Nav/>
 
 
