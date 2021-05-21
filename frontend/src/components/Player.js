@@ -4,51 +4,69 @@ import TextInput from './textInput'
 import ReactPlayer from 'react-player'
 import Button from './button'
 import StateContext from '../StateContext'
+import SocketContext from '../SocketContext'
 
-function Player({ socket, users }) {
+function Player({ users }) {
   const state = useContext(StateContext)
+  const socket = useContext(SocketContext)
   const [inputUrl, setInputUrl] = useState('')
   const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=MnUd31TvBoU')
   const [isPlaying, setIsPlaying] = useState(true)
   const player = useRef()
 
+  const handleGetInfo = data => {
+    setVideoUrl(data.url)
+    player.current.seekTo(data.currTime)
+    //playing if the received status is play, else pause, will adjust for buffering later
+    setIsPlaying(data.currStatus == 1)
+    // if (data.currStatus == 1) player.current.getInternalPlayer().playVideo()
+    // else player.current.getInternalPlayer().pauseVideo()
+  }
+
+  const handleUserJoin = name => {
+    if (state.user.isAdmin)
+      socket.emit('sendInfo', {
+        url: videoUrl,
+        currTime: player.current.getCurrentTime(),
+        currStatus: player.current.getInternalPlayer().getPlayerState(),
+      })
+  }
+
+  const handlePause = () => {
+    if (!state.user.isAdmin) player.current.getInternalPlayer().pauseVideo()
+  }
+
+  const handlePlay = () => {
+    if (!state.user.isAdmin) player.current.getInternalPlayer().playVideo()
+  }
+
+  const handleUrlChange = url => {
+    if (!state.user.isAdmin) setVideoUrl(url)
+  }
+
   //listen for Video Info for the first time component renders
   useEffect(() => {
-    console.log(player.current)
-    socket.on('getInfo', data => {
-      setVideoUrl(data.url)
-      player.current.seekTo(data.currTime)
-      //playing if the received status is play, else pause, will adjust for buffering later
-      setIsPlaying(data.currStatus == 1)
-      // if (data.currStatus == 1) player.current.getInternalPlayer().playVideo()
-      // else player.current.getInternalPlayer().pauseVideo()
-    })
+    socket.on('getInfo', handleGetInfo)
 
     // emitting Video Info from admin if new user joins
-    if (state.user.isAdmin) {
-      socket.on('userJoin', name => {
-        socket.emit('sendInfo', {
-          url: videoUrl,
-          currTime: player.current.getCurrentTime(),
-          currStatus: player.current.getInternalPlayer().getPlayerState(),
-        })
-      })
-    }
+    socket.on('userJoin', handleUserJoin)
 
     //listening for pause from server
-    socket.on('pause', () => {
-      if (!state.user.isAdmin) player.current.getInternalPlayer().pauseVideo()
-    })
+    socket.on('pause', handlePause)
 
     //listening for play from server
-    socket.on('play', () => {
-      if (!state.user.isAdmin) player.current.getInternalPlayer().playVideo()
-    })
+    socket.on('play', handlePlay)
 
     //listening for urlChange from server
-    socket.on('urlChange', url => {
-      if (!state.user.isAdmin) setVideoUrl(url)
-    })
+    socket.on('urlChange', handleUrlChange)
+
+    return () => {
+      socket.off('getInfo', handleGetInfo)
+      socket.off('userJoin', handleUserJoin)
+      socket.off('pause', handlePause)
+      socket.off('play', handlePlay)
+      socket.off('urlChange', handleUrlChange)
+    };
   }, [])
 
   //sending pause Event from Admin so server sends a Pause to everyone in the room

@@ -5,13 +5,15 @@ import '../styles/main.css'
 //Components
 import Textinput from '../components/textInput.js'
 import Chatbit from '../components/chatbit.js'
-import { useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { useImmer } from 'use-immer'
 import StateContext from '../StateContext'
+import SocketContext from '../SocketContext'
 import Button from './button'
 
-function Chatbox({ socket }) {
+function Chatbox() {
   const appState = useContext(StateContext)
+  const socket = useContext(SocketContext)
   const [state, setState] = useImmer({
     chatMessage: [],
     textField: '',
@@ -36,28 +38,40 @@ function Chatbox({ socket }) {
     })
   }
 
+  const handleChatReceive = ({ name, message }) => {
+    console.log(name, message)
+    setState(draft => {
+      draft.chatMessage.push({ text: message, name })
+    })
+  }
+
+  const handleUserJoin = name => {
+    //   console.log(`${name} has joined the room!</div>`)
+    //add message to state collection of message
+    setState(draft => {
+      draft.chatMessage.push({ text: `${name} has joined the room!` })
+    })
+  }
+  
+  const handleUserLeave = name => {
+    //   console.log(`${name} has left the room!</div>`)
+    setState(draft => {
+      draft.chatMessage.push({ text: `${name} has left the room!` })
+    })
+  }
+
   useEffect(() => {
-    socket.on('chatReceive', ({ name, message }) => {
-      console.log(name, message)
-      setState(draft => {
-        draft.chatMessage.push({ text: message, name })
-      })
-    })
+    socket.on('chatReceive', handleChatReceive)
 
-    socket.on('userJoin', name => {
-      //   console.log(`${name} has joined the room!</div>`)
-      //add message to state collection of message
-      setState(draft => {
-        draft.chatMessage.push({ text: `${name} has joined the room!` })
-      })
-    })
+    socket.on('userJoin', handleUserJoin)
 
-    socket.on('userLeave', name => {
-      //   console.log(`${name} has left the room!</div>`)
-      setState(draft => {
-        draft.chatMessage.push({ text: `${name} has left the room!` })
-      })
-    })
+    socket.on('userLeave', handleUserLeave)
+
+    return () => {
+      socket.off('chatReceive', handleChatReceive)
+      socket.off('userJoin', handleUserJoin)
+      socket.off('userLeave', handleUserLeave)
+    }
   }, [])
   return (
     <div className='chatbox flex flex-col w-full ml-3 p-3 bg-gray-900 items-center'>

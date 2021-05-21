@@ -4,6 +4,7 @@ import { Route, BrowserRouter as Router } from 'react-router-dom'
 // Pages
 import Home from './pages/Home'
 import Main from './pages/main'
+import SocketContext, { socket } from './SocketContext'
 import StateContext from './StateContext'
 import UpdateContext from './UpdateContext'
 
@@ -20,6 +21,7 @@ import { useImmer } from 'use-immer'
 function App() {
   const [state, setState] = useImmer({
     user: {
+      id: null,
       username: '',
       isAdmin: true,
     },
@@ -34,10 +36,12 @@ function App() {
       <div className='flex h-full'>
         <StateContext.Provider value={state}>
           <UpdateContext.Provider value={setState}>
-            <Router>
-              <Route path='/' exact component={Home}></Route>
-              <Route path='/app' component={Main}></Route>
-            </Router>
+            <SocketContext.Provider value={socket}>
+              <Router>
+                <Route path='/' exact component={Home}></Route>
+                <Route path='/app' component={Main}></Route>
+              </Router>
+            </SocketContext.Provider>
           </UpdateContext.Provider>
         </StateContext.Provider>
       </div>
