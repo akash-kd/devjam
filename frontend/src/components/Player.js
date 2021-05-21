@@ -16,7 +16,7 @@ function Player({ users }) {
 
   const handleGetInfo = data => {
     setVideoUrl(data.url)
-    player.current.seekTo(data.currTime)
+    player.current.seekTo(data.currTime, seconds)
     //playing if the received status is play, else pause, will adjust for buffering later
     setIsPlaying(data.currStatus == 1)
     // if (data.currStatus == 1) player.current.getInternalPlayer().playVideo()
