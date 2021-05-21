@@ -1,5 +1,5 @@
 import { Route, BrowserRouter as Router } from 'react-router-dom'
-import React, { createRef, useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import TextInput from './textInput'
 import ReactPlayer from 'react-player'
 import Button from './button'
@@ -9,7 +9,8 @@ function Player({ socket, users }) {
   const state = useContext(StateContext)
   const [inputUrl, setInputUrl] = useState('')
   const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=MnUd31TvBoU')
-  const player = createRef(null)
+  const [isPlaying, setIsPlaying] = useState(true)
+  const player = useRef()
 
   //listen for Video Info for the first time component renders
   useEffect(() => {
@@ -18,54 +19,56 @@ function Player({ socket, users }) {
       setVideoUrl(data.url)
       player.current.seekTo(data.currTime)
       //playing if the received status is play, else pause, will adjust for buffering later
-      if (data.currStatus == 1) player.current.playVideo()
-      else player.current.pauseVideo()
+      setIsPlaying(data.currStatus == 1)
+      // if (data.currStatus == 1) player.current.getInternalPlayer().playVideo()
+      // else player.current.getInternalPlayer().pauseVideo()
     })
-  }, [])
 
-  //listening for pause from server
-  socket.on('pause', () => {
-    player.current.pauseVideo()
-  })
-
-  //listening for urlChange from server
-  socket.on('urlChange', url => {
-    setVideoUrl(url)
-  })
-
-  // emitting Video Info from admin if new user joins
-  useEffect(() => {
-    const temp = player.current
-    if (state.user.isAdmin && temp) {
+    // emitting Video Info from admin if new user joins
+    if (state.user.isAdmin) {
       socket.on('userJoin', name => {
-        console.log(temp)
         socket.emit('sendInfo', {
           url: videoUrl,
-          currTime: temp.getCurrentTime(),
-          currStatus: typeof temp.getInternalPlayer().getPlayerState === 'function' && temp.getInternalPlayer().getPlayerState(),
+          currTime: player.current.getCurrentTime(),
+          currStatus: player.current.getInternalPlayer().getPlayerState(),
         })
       })
     }
-  }, [player.current, users])
+
+    //listening for pause from server
+    socket.on('pause', () => {
+      if (!state.user.isAdmin) player.current.getInternalPlayer().pauseVideo()
+    })
+
+    //listening for play from server
+    socket.on('play', () => {
+      if (!state.user.isAdmin) player.current.getInternalPlayer().playVideo()
+    })
+
+    //listening for urlChange from server
+    socket.on('urlChange', url => {
+      if (!state.user.isAdmin) setVideoUrl(url)
+    })
+  }, [])
 
   //sending pause Event from Admin so server sends a Pause to everyone in the room
   const onPause = e => {
     console.log(player.current.getCurrentTime())
-    if (state.user.isAdmin) socket.emit('paused', 'VIDEO PAUSED')
+    if (state.user.isAdmin) socket.emit('paused')
+  }
+
+  const onPlay = e => {
+    console.log(player.current.getCurrentTime())
+    if (state.user.isAdmin) socket.emit('played')
   }
 
   //sending UrlChanged event so server broadcasts a urlChange event
   const handleSubmit = e => {
     e.preventDefault()
     console.log(player.current.getInternalPlayer())
-    if (typeof player.current.getInternalPlayer().getPlayerState === 'function') {
-      console.log(player.current.getInternalPlayer().getPlayerState())
-      console.log(player.current.getCurrentTime())
-    }
     console.log(videoUrl)
-
     setVideoUrl(inputUrl)
-    socket.emit('urlChanged', videoUrl)
+    socket.emit('urlChanged', inputUrl)
     // setVideoId(inputUrl.split('v=')[1].split('&')[0])
   }
 
@@ -93,10 +96,12 @@ function Player({ socket, users }) {
           height='450px'
           style={{ pointerEvents: !state.user.isAdmin && 'none' }}
           onPause={onPause}
+          onPlay={onPlay}
+          playing={isPlaying}
         />
       </div>
       <div>ROOMID = {' ' + state.roomId}</div>
-      <div>USERS = {' ' + users}</div>
+      {state.user.isAdmin && <div>USERS = {' ' + users}</div>}
     </div>
   )
 }

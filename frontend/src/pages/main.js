@@ -12,11 +12,10 @@ import Chatbox from '../components/chatbox'
 function Main(props) {
   const state = useContext(StateContext)
   const setState = useContext(UpdateContext)
-  const [users, setUsers] = useState(1)
+  const [users, setUsers] = useState(0)
 
-  let socket
   const ENDPOINT = 'http://localhost:8080'
-  socket = io(ENDPOINT)
+  const [socket, setSocket] = useState(io(ENDPOINT))
 
   useEffect(() => {
     console.log(state)
@@ -45,16 +44,19 @@ function Main(props) {
         props.history.push('/')
       }
     })
+
+    socket.on('userJoin', name => {
+      console.log(name, 'joined the room')
+      setUsers(users => users + 1)
+    })
+
+    socket.on('userLeave', name => {
+      console.log(name, 'left the room')
+      setUsers(users => users - 1)
+    })
+
+    return () => socket.disconnect()
   }, [])
-
-  socket.on('userJoin', name => {
-    console.log(name, 'joined the room')
-    setUsers(users => users + 1)
-  })
-
-  socket.on('userLeave', name => {
-    console.log(name, 'left the room')
-  })
 
   return (
     <>
