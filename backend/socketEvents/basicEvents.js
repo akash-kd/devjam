@@ -53,7 +53,7 @@ function basicEvents(socket, users, rooms) {
 
   // Helps us keep track of when the user disconnects
   // so that we can perform cleanup tasks
-  socket.on('disconnect', () => {
+  const handleExit = () => {
     console.log('[SOCKET] Client disconnected!')
 
     // Remove the user from the global users list
@@ -90,7 +90,10 @@ function basicEvents(socket, users, rooms) {
       // Tells all the other users in that room, that the user has left
       else socket.broadcast.to(user.room).emit('userLeave', user.name)
     }
-  })
+  }
+
+  socket.on('exit', handleExit)
+  socket.on('disconnect', handleExit)
 }
 
 module.exports = basicEvents
