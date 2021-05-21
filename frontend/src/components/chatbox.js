@@ -52,7 +52,7 @@ function Chatbox() {
       draft.chatMessage.push({ text: `${name} has joined the room!` })
     })
   }
-  
+
   const handleUserLeave = name => {
     //   console.log(`${name} has left the room!</div>`)
     setState(draft => {

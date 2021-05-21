@@ -44,6 +44,10 @@ function Player({ users }) {
     if (!state.user.isAdmin) setVideoUrl(url)
   }
 
+  const handleSeek = currTime => {
+    if (!state.user.isAdmin) player.current.seekTo(currTime)
+  }
+
   //listen for Video Info for the first time component renders
   useEffect(() => {
     socket.on('getInfo', handleGetInfo)
@@ -60,13 +64,16 @@ function Player({ users }) {
     //listening for urlChange from server
     socket.on('urlChange', handleUrlChange)
 
+    socket.on('seek', handleSeek)
+
     return () => {
       socket.off('getInfo', handleGetInfo)
+      socket.off('seek', handleSeek)
       socket.off('userJoin', handleUserJoin)
       socket.off('pause', handlePause)
       socket.off('play', handlePlay)
       socket.off('urlChange', handleUrlChange)
-    };
+    }
   }, [])
 
   //sending pause Event from Admin so server sends a Pause to everyone in the room
@@ -83,11 +90,17 @@ function Player({ users }) {
   //sending UrlChanged event so server broadcasts a urlChange event
   const handleSubmit = e => {
     e.preventDefault()
-    console.log(player.current.getInternalPlayer())
+    // console.log(player.current.getInternalPlayer())
     console.log(videoUrl)
+    console.log(ReactPlayer.canPlay(videoUrl))
     setVideoUrl(inputUrl)
     socket.emit('urlChanged', inputUrl)
     // setVideoId(inputUrl.split('v=')[1].split('&')[0])
+  }
+
+  const onSeek = e => {
+    console.log(player.current.getCurrentTime())
+    socket.emit('seeked', player.current.getCurrentTime())
   }
 
   return (
@@ -101,6 +114,7 @@ function Player({ users }) {
         </div>
       )}
       <div>
+        {!ReactPlayer.canPlay(videoUrl) && <div>INVALID URL</div>}
         <ReactPlayer
           ref={player}
           id='player'
@@ -116,6 +130,7 @@ function Player({ users }) {
           onPause={onPause}
           onPlay={onPlay}
           playing={isPlaying}
+          onSeek={onSeek}
         />
       </div>
       <div>ROOMID = {' ' + state.roomId}</div>
