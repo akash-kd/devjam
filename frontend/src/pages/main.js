@@ -5,7 +5,6 @@ import { useContext } from 'react'
 import StateContext from '../StateContext'
 import UpdateContext from '../UpdateContext'
 import { withRouter } from 'react-router'
-import Chat from '../components/Chat'
 
 import Chatbox from '../components/chatbox'
 
@@ -13,7 +12,7 @@ function Main(props) {
   const state = useContext(StateContext)
   const setState = useContext(UpdateContext)
   const [users, setUsers] = useState(0)
-  
+
   const ENDPOINT = 'http://localhost:8080'
   const [socket, setSocket] = useState(io(ENDPOINT))
 
@@ -40,17 +39,19 @@ function Main(props) {
       // Means he tried to join a non-existent room
       // so we kick him
       if (!check) {
-        console.error('Please enter a valid room code!')
+        alert('Please enter a valid room code!')
         props.history.push('/')
       }
     })
 
     socket.on('userJoin', name => {
       console.log(name, 'joined the room')
+      setUsers(users => users + 1)
     })
-  
+
     socket.on('userLeave', name => {
       console.log(name, 'left the room')
+      setUsers(users => users - 1)
     })
 
     return () => socket.disconnect()
@@ -58,8 +59,8 @@ function Main(props) {
 
   return (
     <>
-      <Player socket={socket} />
-      <Chatbox />
+      <Player users={users} socket={socket} />
+      <Chatbox socket={socket} />
     </>
   )
 }

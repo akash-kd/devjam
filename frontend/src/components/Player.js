@@ -5,7 +5,7 @@ import ReactPlayer from 'react-player'
 import Button from './button'
 import StateContext from '../StateContext'
 
-function Player({ socket }) {
+function Player({ socket, users }) {
   const state = useContext(StateContext)
   const [inputUrl, setInputUrl] = useState('')
   const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=MnUd31TvBoU')
@@ -14,6 +14,7 @@ function Player({ socket }) {
 
   //listen for Video Info for the first time component renders
   useEffect(() => {
+    console.log(player.current)
     socket.on('getInfo', data => {
       setVideoUrl(data.url)
       player.current.seekTo(data.currTime)
@@ -64,10 +65,8 @@ function Player({ socket }) {
   //sending UrlChanged event so server broadcasts a urlChange event
   const handleSubmit = e => {
     e.preventDefault()
-    console.log(player.current.getInternalPlayer().getPlayerState())
-    console.log(player.current.getCurrentTime())
+    console.log(player.current.getInternalPlayer())
     console.log(videoUrl)
-
     setVideoUrl(inputUrl)
     socket.emit('urlChanged', inputUrl)
     // setVideoId(inputUrl.split('v=')[1].split('&')[0])
@@ -86,6 +85,7 @@ function Player({ socket }) {
       <div>
         <ReactPlayer
           ref={player}
+          id='player'
           config={{
             youtube: {
               playerVars: { controls: state.user.isAdmin ? 1 : 0 },
@@ -100,6 +100,8 @@ function Player({ socket }) {
           playing={isPlaying}
         />
       </div>
+      <div>ROOMID = {' ' + state.roomId}</div>
+      {state.user.isAdmin && <div>USERS = {' ' + users}</div>}
     </div>
   )
 }
