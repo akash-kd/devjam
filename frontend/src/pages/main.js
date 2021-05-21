@@ -5,7 +5,6 @@ import { useContext } from 'react'
 import StateContext from '../StateContext'
 import UpdateContext from '../UpdateContext'
 import { withRouter } from 'react-router'
-import Chat from '../components/Chat'
 
 import Chatbox from '../components/chatbox'
 
@@ -61,7 +60,7 @@ function Main(props) {
   return (
     <>
       <Player users={users} socket={socket} />
-      <Chatbox />
+      <Chatbox socket={socket} />
     </>
   )
 }
