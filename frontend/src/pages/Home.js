@@ -31,6 +31,22 @@ function Home(props) {
         placeholder='Enter your name'
       />
 
+      <TextInput
+        value={state.roomId}
+        placeholder="Enter the Room's Name"
+      />
+        
+      <TextInput
+        value={state.roomId}
+        onChange={e =>
+          setState(state => {
+            state.roomId = e.target.value
+          })
+        }
+        placeholder='Enter the Room Code'
+      />
+
+
         <div className="flex flex-col w-full py-2">
 
             <Link to={`/app?name=${state.user.isAdmin}&roomId=${state.roomId}`}>
