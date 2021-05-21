@@ -31,7 +31,7 @@ function Home(props) {
         />
 
         <div className='flex flex-col w-full py-2'>
-          <Link to={`/app`}>
+          <Link className={!state.user.username && 'disabled-link'} to={`/app`}>
             <Button
               onClick={() =>
                 setState(state => {
@@ -46,7 +46,7 @@ function Home(props) {
           <a className='text-center w-100 text-xl my-3'> or</a>
 
           <div className='flex flex-row items-center justify-between'>
-            <Link to={`/app`}>
+            <Link className={(!state.user.username || !state.roomId) && 'disabled-link'} to={`/app`}>
               <Button
                 text='Join Room'
                 onClick={() =>
