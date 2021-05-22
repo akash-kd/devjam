@@ -27,7 +27,7 @@ function Chatbox() {
   }
 
   function handleSubmit(e) {
-    console.log(appState.user.id)
+    console.log(appState)
     e.preventDefault()
     //sending message to server
     if (state.textField) {
@@ -62,6 +62,12 @@ function Chatbox() {
     })
   }
 
+  const handleAdminLeave = ({ name, new_admin }) => {
+    setState(draft => {
+      draft.chatMessage.push({ text: `${name} has left the room! ${new_admin.name} is the new admin` })
+    })
+  }
+
   useEffect(() => {
     socket.on('chatReceive', handleChatReceive)
 
@@ -69,10 +75,14 @@ function Chatbox() {
 
     socket.on('userLeave', handleUserLeave)
 
+    socket.on('adminLeave', handleAdminLeave)
+
     return () => {
+      // socket.off('adminLeave', handleAdminLeave)
       socket.off('chatReceive', handleChatReceive)
       socket.off('userJoin', handleUserJoin)
       socket.off('userLeave', handleUserLeave)
+      socket.off('adminLeave', handleAdminLeave)
     }
   }, [])
   return (
