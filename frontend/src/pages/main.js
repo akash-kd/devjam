@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useRef, useState } from 'react'
 import Player from '../components/Player'
 import { io } from 'socket.io-client'
 import { useContext } from 'react'
@@ -14,9 +14,9 @@ function Main(props) {
   const setState = useContext(UpdateContext)
   const socket = useContext(SocketContext)
   const [users, setUsers] = useState(0)
+  // const stateAftergetId = useRef()
 
   const handleGetRoom = r => {
-    console.log(r)
     setState(state => {
       state.roomId = r.id
     })
@@ -24,9 +24,11 @@ function Main(props) {
   }
 
   const handleGetID = id => {
+    console.log('ID RETRIEVED')
     setState(state => {
       state.user.id = id
     })
+    // console.log(state)
   }
 
   const handleValidateRoom = check => {
@@ -39,19 +41,28 @@ function Main(props) {
   }
 
   const handleUserJoin = name => {
+    console.log(state)
     console.log(name, 'joined the room')
-    console.log(state.user.id)
     setUsers(users => users + 1)
   }
 
   const handleUserLeave = name => {
+    console.log(state.user.id)
     console.log(name, 'left the room')
     setUsers(users => users - 1)
   }
 
-  useEffect(() => {
-    console.log(state)
+  const handleAdminLeave = ({ name, new_admin }) => {
+    console.log(state.user.id)
+    console.log(name, new_admin)
+    if (state.user.id == new_admin.id) {
+      setState(draft => {
+        draft.user.isAdmin = true
+      })
+    }
+  }
 
+  useEffect(() => {
     socket.emit('enter', { name: state.user.username, room: state.roomId, type: state.user.isAdmin ? 'create' : 'join' })
 
     // Will happen if type mentioned by the user is create
@@ -62,19 +73,27 @@ function Main(props) {
     // Will happen if type mentioned by the user is join
     socket.on('validateRoom', handleValidateRoom)
 
-    socket.on('userJoin', handleUserJoin)
-
-    socket.on('userLeave', handleUserLeave)
-
     return () => {
       socket.emit('exit')
       socket.off('getRoom', handleGetRoom)
       socket.off('getID', handleGetID)
       socket.off('validateRoom', handleValidateRoom)
+      socket.off('adminLeave', handleAdminLeave)
       socket.off('userJoin', handleUserJoin)
       socket.off('userLeave', handleUserLeave)
     }
   }, [])
+
+  useEffect(() => {
+    if (state.user.id) {
+      console.log(state)
+      socket.on('userJoin', handleUserJoin)
+
+      socket.on('userLeave', handleUserLeave)
+
+      socket.on('adminLeave', handleAdminLeave)
+    }
+  }, [state.user.id])
 
   return (
     <>

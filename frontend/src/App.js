@@ -17,7 +17,6 @@ import './styles/main.css'
 
 import { useImmer } from 'use-immer'
 
-
 function App() {
   const [state, setState] = useImmer({
     user: {
@@ -25,7 +24,7 @@ function App() {
       username: '',
       isAdmin: true,
     },
-    roomID: '',
+    roomId: '',
   })
 
   return (
