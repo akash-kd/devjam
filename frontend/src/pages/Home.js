@@ -18,7 +18,7 @@ function Home(props) {
   return (
     <div className='flex flex-row w-full py-3 px-12 items-center justify-center'>
       <div className='flex flex-col bg-gray-900 h-5/6 w-1/3 p-4 border-2 border-indigo-600 rounded-md items-center justify-center'>
-        <a className='text-center w-100 text-md my-2 opacity-70'>Enjoy the vedio with friend losing no Sync !</a>
+        <a className='text-center w-100 text-md my-2 opacity-70'>Watch videos and chat seamlessly losing no sync!</a>
 
         <TextInput
           value={state.user.username}

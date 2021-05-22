@@ -103,10 +103,10 @@ function Player({ users }) {
     // setVideoId(inputUrl.split('v=')[1].split('&')[0])
   }
 
-  const onSeek = e => {
-    console.log(player.current.getCurrentTime())
-    socket.emit('seeked', player.current.getCurrentTime())
-  }
+  // const onSeek = e => {
+  //   console.log(player.current.getCurrentTime())
+  //   socket.emit('seeked', player.current.getCurrentTime())
+  // }
 
   return (
     <div className='flex flex-col justify-center'>
@@ -116,7 +116,7 @@ function Player({ users }) {
             <form onSubmit={handleSubmit} className='flex flex-row'>
               <TextInput placeholder='Enter YT video link' value={inputUrl} onChange={e => setInputUrl(e.target.value)} />
               <button type='submit' className='flex shadow-md w-36 items-center justify-center text-white py-2 px-2 my-2 ml-2 text-center border-2 rounded-md border-indigo-600 bg-indigo-500'>
-                Change Vedio
+                Change Video
               </button>
             </form>
           </div>
@@ -139,7 +139,7 @@ function Player({ users }) {
           onPause={onPause}
           onPlay={onPlay}
           playing={isPlaying}
-          onSeek={onSeek}
+          // onSeek={onSeek}
         />
       </div>
 
