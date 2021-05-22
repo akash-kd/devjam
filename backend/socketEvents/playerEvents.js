@@ -14,14 +14,14 @@ function playerEvents(socket, users, rooms) {
     socket.broadcast.to(user.room).emit('pause')
   })
 
-  socket.on('played', () => {
+  socket.on('played', currentTime => {
     let user = users.find(user => user.id === socket.id)
-    socket.broadcast.to(user.room).emit('play')
+    socket.broadcast.to(user.room).emit('play', currentTime)
   })
 
   socket.on('seeked', currentTime => {
     let user = users.find(user => user.id === socket.id)
-    socket.broadcast.to(user.room).emit('seeke', currentTime)
+    socket.broadcast.to(user.room).emit('seek', currentTime)
   })
 }
 

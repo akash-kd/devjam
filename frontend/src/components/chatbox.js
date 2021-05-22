@@ -27,15 +27,17 @@ function Chatbox() {
   }
 
   function handleSubmit(e) {
-    console.log(state.textField)
+    console.log(appState.user.id)
     e.preventDefault()
     //sending message to server
-    if (state.textField) socket.emit('chatSend', state.textField)
-    //making the textField empty after sending
-    setState(draft => {
-      draft.chatMessage.push({ text: state.textField, name: appState.user.username })
-      draft.textField = ''
-    })
+    if (state.textField) {
+      socket.emit('chatSend', state.textField)
+      //making the textField empty after sending
+      setState(draft => {
+        draft.chatMessage.push({ text: state.textField, name: appState.user.username })
+        draft.textField = ''
+      })
+    }
   }
 
   const handleChatReceive = ({ name, message }) => {
