@@ -109,17 +109,20 @@ function Player({ users }) {
   }
 
   return (
-    <div>
+    <div className='flex flex-col justify-center'>
       {state.user.isAdmin && (
-        <div>
-          <form onSubmit={handleSubmit}>
-            <TextInput placeholder='Enter YT video link' value={inputUrl} onChange={e => setInputUrl(e.target.value)} />
-            <Button text='change video' type='submit' />
-          </form>
+        <div className="flex h-full w-full justify-center">
+          <div className="flex flex-col w-full justify-center">
+            <form onSubmit={handleSubmit} className="flex flex-row">
+              <TextInput placeholder='Enter YT video link' value={inputUrl} onChange={e => setInputUrl(e.target.value)} />
+              <button type='submit' className="flex shadow-md w-36 items-center justify-center text-white py-2 px-2 my-2 ml-2 text-center border-2 rounded-md border-indigo-600 bg-indigo-500">Change Vedio</button>
+            </form>
+          </div>
         </div>
       )}
-      <div>
-        {!ReactPlayer.canPlay(videoUrl) && <div>INVALID URL</div>}
+      <div className="flex">
+        {
+        !ReactPlayer.canPlay(videoUrl) && <div>INVALID URL</div>}
         <ReactPlayer
           ref={player}
           id='player'
@@ -129,8 +132,8 @@ function Player({ users }) {
             },
           }}
           url={videoUrl}
-          width='800px'
-          height='450px'
+          width='900px'
+          height='500px'
           style={{ pointerEvents: !state.user.isAdmin && 'none' }}
           onPause={onPause}
           onPlay={onPlay}
@@ -138,8 +141,11 @@ function Player({ users }) {
           onSeek={onSeek}
         />
       </div>
-      <div>ROOMID = {' ' + state.roomId}</div>
-      {state.user.isAdmin && <div>USERS = {' ' + users}</div>}
+
+      <div className="flex flex-col h-full w-full justify-center">
+        <div>ROOMID = {' ' + state.roomId}</div>
+        {state.user.isAdmin && <div>USERS = {' ' + users}</div>}
+      </div>
     </div>
   )
 }

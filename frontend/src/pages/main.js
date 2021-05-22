@@ -77,10 +77,11 @@ function Main(props) {
   }, [])
 
   return (
-    <>
+    <div className="flex flex-row w-full h-full sm:flex-row p-10 justify-center">
       <Player users={users} />
+      
       <Chatbox />
-    </>
+    </div>
   )
 }
 

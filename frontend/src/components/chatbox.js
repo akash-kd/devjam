@@ -76,22 +76,25 @@ function Chatbox() {
     }
   }, [])
   return (
-    <div className='chatbox flex flex-col w-full ml-3 p-3 bg-gray-900 items-center'>
-      <a className='text-lg underline'>Chat</a>
+    <div className="flex h-full w-full justify-center items-center">
+      <div className='flex flex-col h-full w-full ml-3 p-3 bg-gray-900 items-center'>
+        <a className='text-lg underline'>Chat</a>
 
-      <div className='flex flex-col flex-grow w-full overflow-y-auto'>
-        {state.chatMessage.map(({ text, name }, index) => {
-          return (
-            <div key={index}>
-              <Chatbit name={name} text={text} />
-            </div>
-          )
-        })}
+        <div className='flex flex-col flex-grow w-full overflow-y-auto'>
+          {state.chatMessage.map(({ text, name }, index) => {
+            return (
+              <div key={index}>
+                <Chatbit name={name} text={text} />
+              </div>
+            )
+          })}
+        </div>
+        <form className="flex flex-row w-full">
+          <Textinput value={state.textField} onChange={e => updateField(e)} placeholder='Type your message here' />
+          <button type='submit' className="flex shadow-md w-20 items-center justify-center text-white py-2 px-2 my-2 ml-2 text-center border-2 rounded-md border-indigo-600 bg-indigo-500" onClick={handleSubmit}>Send</button>
+          
+        </form>
       </div>
-      <form>
-        <Textinput value={state.textField} onChange={e => updateField(e)} placeholder='Type your message here' />
-        <Button type='submit' text='Send' onClick={handleSubmit} />
-      </form>
     </div>
   )
 }
