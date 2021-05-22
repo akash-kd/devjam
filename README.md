@@ -5,8 +5,7 @@
 This project was developed by us, **Team ECMAniacs**, as a submission for [Weekend of Code](https://woc2k21.github.io/)
 
 ## Resources
-- [PPT](/)
-- [Demo](/)
+- [PPT & Video](https://drive.google.com/drive/folders/1aS0KgTq3POjXm_beLDLxl32LeOfPOqr-)
 
 ## Team ECMAniacs
 - [Aqib Suhail](https://github.com/geeqib23)
