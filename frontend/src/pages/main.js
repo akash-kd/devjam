@@ -25,7 +25,7 @@ function Main(props) {
 
   const handleGetID = id => {
     setState(state => {
-      state.id = id
+      state.user.id = id
     })
   }
 
@@ -40,6 +40,7 @@ function Main(props) {
 
   const handleUserJoin = name => {
     console.log(name, 'joined the room')
+    console.log(state.user.id)
     setUsers(users => users + 1)
   }
 

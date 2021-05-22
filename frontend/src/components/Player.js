@@ -10,7 +10,7 @@ function Player({ users }) {
   const state = useContext(StateContext)
   const socket = useContext(SocketContext)
   const [inputUrl, setInputUrl] = useState('')
-  const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=MnUd31TvBoU')
+  const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=I8PkQgPiSq8')
   const [isPlaying, setIsPlaying] = useState(true)
   const player = useRef()
 
@@ -36,8 +36,12 @@ function Player({ users }) {
     if (!state.user.isAdmin) player.current.getInternalPlayer().pauseVideo()
   }
 
-  const handlePlay = () => {
-    if (!state.user.isAdmin) player.current.getInternalPlayer().playVideo()
+  const handlePlay = currentTime => {
+    console.log(state.user.id)
+    if (!state.user.isAdmin) {
+      player.current.seekTo(currentTime, 'seconds')
+      player.current.getInternalPlayer().playVideo()
+    }
   }
 
   const handleUrlChange = url => {
@@ -84,13 +88,14 @@ function Player({ users }) {
 
   const onPlay = e => {
     console.log(player.current.getCurrentTime())
-    if (state.user.isAdmin) socket.emit('played')
+    if (state.user.isAdmin) socket.emit('played', player.current.getCurrentTime())
   }
 
   //sending UrlChanged event so server broadcasts a urlChange event
   const handleSubmit = e => {
     e.preventDefault()
     // console.log(player.current.getInternalPlayer())
+    console.log(state.user)
     console.log(videoUrl)
     console.log(ReactPlayer.canPlay(videoUrl))
     setVideoUrl(inputUrl)
