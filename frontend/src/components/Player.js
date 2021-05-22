@@ -103,34 +103,35 @@ function Player({ users }) {
     // setVideoId(inputUrl.split('v=')[1].split('&')[0])
   }
 
-  const onSeek = e => {
-    console.log(player.current.getCurrentTime())
-    socket.emit('seeked', player.current.getCurrentTime())
-  }
+  // const onSeek = e => {
+  //   console.log(player.current.getCurrentTime())
+  //   socket.emit('seeked', player.current.getCurrentTime())
+  // }
 
   return (
     <div className='flex flex-col justify-center'>
       {state.user.isAdmin && (
-        <div className="flex h-full w-full justify-center">
-          <div className="flex flex-col w-full justify-center">
-            <form onSubmit={handleSubmit} className="flex flex-row">
+        <div className='flex h-full w-full justify-center'>
+          <div className='flex flex-col w-full justify-center'>
+            <form onSubmit={handleSubmit} className='flex flex-row'>
               <TextInput placeholder='Enter YT video link' value={inputUrl} onChange={e => setInputUrl(e.target.value)} />
-              <button type='submit' className="flex shadow-md w-36 items-center justify-center text-white py-2 px-2 my-2 ml-2 text-center border-2 rounded-md border-indigo-600 bg-indigo-500">Change Vedio</button>
+              <button type='submit' className='flex shadow-md w-36 items-center justify-center text-white py-2 px-2 my-2 ml-2 text-center border-2 rounded-md border-indigo-600 bg-indigo-500'>
+                Change Video
+              </button>
             </form>
           </div>
         </div>
       )}
-      <div className="flex">
-        {
-        !ReactPlayer.canPlay(videoUrl) && <div>INVALID URL</div>}
+      <div className='flex'>
+        {!ReactPlayer.canPlay(videoUrl) && <div>INVALID URL</div>}
         <ReactPlayer
           ref={player}
           id='player'
-          config={{
-            youtube: {
-              playerVars: { controls: state.user.isAdmin ? 1 : 0 },
-            },
-          }}
+          // config={{
+          //   youtube: {
+          //     playerVars: { controls: state.user.isAdmin ? 1 : 1 },
+          //   },
+          // }}
           url={videoUrl}
           width='900px'
           height='500px'
@@ -138,11 +139,11 @@ function Player({ users }) {
           onPause={onPause}
           onPlay={onPlay}
           playing={isPlaying}
-          onSeek={onSeek}
+          // onSeek={onSeek}
         />
       </div>
 
-      <div className="flex flex-col h-full w-full justify-center">
+      <div className='flex flex-col h-full w-full justify-center'>
         <div>ROOMID = {' ' + state.roomId}</div>
         {state.user.isAdmin && <div>USERS = {' ' + users}</div>}
       </div>
