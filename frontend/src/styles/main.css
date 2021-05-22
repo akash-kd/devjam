@@ -16,3 +16,7 @@ body {
 .disabled-link {
   pointer-events: none;
 }
+
+.disabled-link button:disabled {
+  opacity: 0.3;
+}
